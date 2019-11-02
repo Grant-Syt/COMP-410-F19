@@ -22,6 +22,34 @@ public class MinBinHeap_Playground {
     mbh.build(collection);
     printHeapCollection(collection);
     printHeap(mbh.getHeap(), mbh.size());
+    mbh.delMin();
+    System.out.println("\n" + "del1");
+    printHeap(mbh.getHeap(), mbh.size());
+    mbh.delMin();
+    System.out.println("\n" + "del2");
+    printHeap(mbh.getHeap(), mbh.size());
+    
+    mbh.delMin();
+    System.out.println("\n" + "del3");
+    printHeap(mbh.getHeap(), mbh.size());
+    mbh.delMin();
+    System.out.println("\n" + "del4");
+    printHeap(mbh.getHeap(), mbh.size());
+    mbh.delMin();
+    System.out.println("\n" + "del5");
+    printHeap(mbh.getHeap(), mbh.size());
+    mbh.delMin();
+    System.out.println("\n" + "del6");
+    printHeap(mbh.getHeap(), mbh.size());
+    mbh.delMin();
+    System.out.println("\n" + "del7");
+    printHeap(mbh.getHeap(), mbh.size());
+    mbh.delMin();
+    System.out.println("\n" + "del8");
+    printHeap(mbh.getHeap(), mbh.size());
+    mbh.delMin();
+    System.out.println("\n" + "del9");
+    printHeap(mbh.getHeap(), mbh.size());
   }
   
   public static void printHeapCollection(EntryPair[] e) { 

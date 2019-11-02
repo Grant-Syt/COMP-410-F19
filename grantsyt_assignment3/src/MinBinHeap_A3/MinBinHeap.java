@@ -28,16 +28,21 @@ public class MinBinHeap implements Heap_Interface {
 	@Override
 	public void insert(EntryPair entry) {
 		// description in interface
-		int hole = size + 1;
-		while ( hole > 1 && 
-				entry.getPriority() < 
-				array[(int) Math.floor(hole / 2)].getPriority()){
-			array[hole] = array[(int) Math.floor(hole / 2)];
-			array[(int) Math.floor(hole / 2)] = null;
-			hole = (int) Math.floor(hole / 2);
+		if (size + 1 <= arraySize) {
+			int hole = size + 1;
+			while ( hole > 1 && 
+					entry.getPriority() < 
+					array[(int) Math.floor(hole / 2)].getPriority()){
+				array[hole] = array[(int) Math.floor(hole / 2)];
+				array[(int) Math.floor(hole / 2)] = null;
+				hole = (int) Math.floor(hole / 2);
+			}
+			array[hole] = entry;
+			size++;
+		} else {
+			throw new IndexOutOfBoundsException(
+					"Attempted to insert more EntryPairs than MinBinHeap can hold");
 		}
-		array[hole] = entry;
-		size++;
 	}
 
 	@Override
@@ -48,48 +53,10 @@ public class MinBinHeap implements Heap_Interface {
 				array[1] = null;
 				size--;
 			} else {
-				array[1] = null;
-				size--;
 				EntryPair temp = array[size];
 				array[size] = null;
-				int hole = 1;
-				boolean keepGoing = true;
-				while (keepGoing) {
-					if (array[hole*2] == null && array[(hole*2) + 1] == null) {
-						keepGoing = false;
-					} else if (array[hole*2] != null && array[(hole*2) + 1] != null) {
-						if (array[hole*2].getPriority() > array[hole].getPriority() && 
-								array[(hole*2) + 1].getPriority() > array[hole].getPriority()) {
-							keepGoing = false;
-						} else if (array[hole*2].getPriority() < array[(hole*2) + 1].getPriority()) {
-							array[hole] = array[hole*2];
-							array[hole*2] = null;
-							hole = hole*2;
-						} else {
-							array[hole] = array[(hole*2) + 1];
-							array[(hole*2) + 1] = null;
-							hole = (hole*2) + 1;
-						}
-					} else if (array[hole*2] != null) {
-						if (array[hole*2].getPriority() > array[hole].getPriority()) {
-							keepGoing = false;
-						} else {
-							array[hole] = array[hole*2];
-							array[hole*2] = null;
-							hole = hole*2;
-						}
-					} else {
-						if (array[(hole*2) + 1].getPriority() > array[hole].getPriority()) {
-							keepGoing = false;
-						} else {
-							array[hole] = array[(hole*2) + 1];
-							array[(hole*2) + 1] = null;
-							hole = (hole*2) + 1;
-						}
-					}
-					
-				}
-				array[hole] = temp;
+				size--;
+				bubbleDown(1, temp);
 			}
 		}
 	}
@@ -119,17 +86,26 @@ public class MinBinHeap implements Heap_Interface {
 		}
 		int lastParentPos = (int) Math.floor(size/2);
 		for (int i = lastParentPos; i > 0; i--) {
-			// start editing here
-			EntryPair temp = array[i];
-			array[size] = null;
-			int hole = 1;
-			boolean keepGoing = true;
-			while (keepGoing) {
+			bubbleDown(i, array[i]);
+		}
+	}
+
+	// helper methods
+
+	private void bubbleDown(int hole, EntryPair temp) {
+		/* in: location in array that becomes hole and EntryPair to eventually insert
+		 * effect: makes hole, swaps down until heap order is achieved, and inserts temp
+		 * out: n/a
+		 */
+		array[hole] = null;
+		boolean keepGoing = true;
+		while (keepGoing) {
+			if (hole*2 < arraySize && (hole*2) + 1 <= arraySize) {
 				if (array[hole*2] == null && array[(hole*2) + 1] == null) {
 					keepGoing = false;
 				} else if (array[hole*2] != null && array[(hole*2) + 1] != null) {
-					if (array[hole*2].getPriority() > array[hole].getPriority() && 
-							array[(hole*2) + 1].getPriority() > array[hole].getPriority()) {
+					if (array[hole*2].getPriority() > temp.getPriority() && 
+							array[(hole*2) + 1].getPriority() > temp.getPriority()) {
 						keepGoing = false;
 					} else if (array[hole*2].getPriority() < array[(hole*2) + 1].getPriority()) {
 						array[hole] = array[hole*2];
@@ -141,7 +117,7 @@ public class MinBinHeap implements Heap_Interface {
 						hole = (hole*2) + 1;
 					}
 				} else if (array[hole*2] != null) {
-					if (array[hole*2].getPriority() > array[hole].getPriority()) {
+					if (array[hole*2].getPriority() > temp.getPriority()) {
 						keepGoing = false;
 					} else {
 						array[hole] = array[hole*2];
@@ -149,7 +125,7 @@ public class MinBinHeap implements Heap_Interface {
 						hole = hole*2;
 					}
 				} else {
-					if (array[(hole*2) + 1].getPriority() > array[hole].getPriority()) {
+					if (array[(hole*2) + 1].getPriority() > temp.getPriority()) {
 						keepGoing = false;
 					} else {
 						array[hole] = array[(hole*2) + 1];
@@ -157,10 +133,22 @@ public class MinBinHeap implements Heap_Interface {
 						hole = (hole*2) + 1;
 					}
 				}
-				
+			} else {
+				if (hole*2 == arraySize) {
+					if (array[hole*2].getPriority() > temp.getPriority()) {
+						keepGoing = false;
+					} else {
+						array[hole] = array[hole*2];
+						array[hole*2] = null;
+						hole = hole*2;
+						keepGoing = false;
+					}
+				} else {
+					// both children > arraySize
+					keepGoing = false;
+				}
 			}
-			array[hole] = temp;
 		}
+		array[hole] = temp;
 	}
-
 }
